@@ -1,15 +1,23 @@
+require('dotenv').config();
 const express = require('express');
-const { resolve } = require('path');
+const mongoose = require('mongoose');
+const cors = require('cors');
 
 const app = express();
-const port = 3010;
+const PORT = process.env.PORT || 8000;
 
-app.use(express.static('static'));
+// Middleware
+app.use(express.json());
+app.use(cors());
 
-app.get('/', (req, res) => {
-  res.sendFile(resolve(__dirname, 'pages/index.html'));
-});
+// MongoDB Connection
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log('MongoDB Connected'))
+    .catch(err => console.error('MongoDB Connection Error:', err));
 
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
-});
+const MenuItem = require('./models/MenuItem');
+
+// Routes
+app.use('/menu', require('./routes/menuRoutes'));
+
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
